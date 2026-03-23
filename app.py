@@ -8,16 +8,25 @@ from sklearn.metrics.pairwise import cosine_similarity
 # Page config
 st.set_page_config(page_title="AI Resume Screener", layout="wide")
 
-# 🔥 DARK PREMIUM UI CSS
+# 🔥 ANIMATED GRADIENT BACKGROUND
 st.markdown("""
 <style>
 
-/* Background */
+/* Animated Background */
 [data-testid="stAppViewContainer"] {
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #1c1c1c);
+    background-size: 400% 400%;
+    animation: gradientMove 12s ease infinite;
 }
 
-/* Main container */
+/* Animation */
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Glass container */
 [data-testid="stMain"] {
     background-color: rgba(0, 0, 0, 0.4);
     padding: 20px;
@@ -51,11 +60,6 @@ textarea {
     height: 3em;
     width: 100%;
     border: none;
-}
-
-/* Remove white blocks */
-.block-container {
-    background: transparent !important;
 }
 
 /* Progress bar */
@@ -95,7 +99,7 @@ def get_skills(text):
 
 st.markdown("---")
 
-# Main button
+# Button
 if st.button("🚀 Screen Resumes"):
 
     if job_desc and uploaded_files:
@@ -107,12 +111,12 @@ if st.button("🚀 Screen Resumes"):
         for file in uploaded_files:
             resume_text = extract_text(file)
 
-            # Similarity
+            # Similarity calculation
             text_data = [job_desc, resume_text]
             cv = CountVectorizer().fit_transform(text_data)
             similarity = cosine_similarity(cv)[0][1]
 
-            # Skills
+            # Skill comparison
             resume_skills = get_skills(resume_text)
             matched = jd_skills.intersection(resume_skills)
             missing = jd_skills - resume_skills
@@ -120,7 +124,7 @@ if st.button("🚀 Screen Resumes"):
             scores.append((file.name, round(similarity * 100, 2)))
             skill_results.append((file.name, matched, missing))
 
-        # Sort
+        # Sort results
         scores.sort(key=lambda x: x[1], reverse=True)
 
         df = pd.DataFrame(scores, columns=["Candidate", "Match %"])
@@ -131,7 +135,7 @@ if st.button("🚀 Screen Resumes"):
         top = df.iloc[0]
         st.success(f"🌟 Top Candidate: {top['Candidate']} ({top['Match %']}%)")
 
-        # 📊 Pie chart (small & clean)
+        # 📊 Pie chart (small)
         st.markdown("### 📊 Match Distribution")
         fig, ax = plt.subplots(figsize=(4, 4))
         ax.pie(
@@ -165,7 +169,7 @@ if st.button("🚀 Screen Resumes"):
 
             st.markdown("---")
 
-        # Download CSV
+        # Download
         csv = df.to_csv(index=False).encode('utf-8')
         st.download_button("📥 Download Results", csv, "results.csv", "text/csv")
 

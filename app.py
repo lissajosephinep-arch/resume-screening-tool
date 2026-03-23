@@ -84,15 +84,21 @@ if st.button("🚀 Screen Resumes"):
 
         df = pd.DataFrame(scores, columns=["Candidate", "Match %"])
 
-        st.markdown("## 🏆 Results")
+    st.markdown("## 🏆 Results")
 
-        # Top candidate
-        top = df.iloc[0]
-        st.success(f"🌟 Top Candidate: {top['Candidate']} ({top['Match %']}%)")
+# Top candidate
+top = df.iloc[0]
+st.success(f"🌟 Top Candidate: {top['Candidate']} ({top['Match %']}%)")
 
-        # PIE CHART 📊
-        st.markdown("### 📊 Match Distribution")
-        fig, ax = plt.subplots(figsize=(4, 4))
+# PIE CHART
+fig, ax = plt.subplots(figsize=(4, 4))
+ax.pie(df["Match %"], labels=df["Candidate"], autopct='%1.1f%%')
+st.pyplot(fig)
+
+# Candidate loop
+for i, (name, score) in enumerate(scores):
+    st.markdown(f"### {name}")
+    st.progress(int(score))
 ax.pie(
     df["Match %"],
     labels=df["Candidate"],

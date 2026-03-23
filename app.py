@@ -1,5 +1,5 @@
 import streamlit as st
-from PyPDF2 import PdfReader
+import fitz  # PyMuPDF
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -10,10 +10,9 @@ uploaded_files = st.file_uploader("Upload Resumes (PDF)", accept_multiple_files=
 
 def extract_text(file):
     text = ""
-    reader = PdfReader(file)
-    for page in reader.pages:
-        if page.extract_text():
-            text += page.extract_text()
+    with fitz.open(stream=file.read(), filetype="pdf") as doc:
+        for page in doc:
+            text += page.get_text()
     return text
 
 if st.button("Screen Resumes"):

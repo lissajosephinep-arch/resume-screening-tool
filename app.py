@@ -92,9 +92,16 @@ if st.button("🚀 Screen Resumes"):
 
         # PIE CHART 📊
         st.markdown("### 📊 Match Distribution")
-        fig, ax = plt.subplots()
-        ax.pie(df["Match %"], labels=df["Candidate"], autopct='%1.1f%%')
-        st.pyplot(fig)
+        fig, ax = plt.subplots(figsize=(4, 4))
+ax.pie(
+    df["Match %"],
+    labels=df["Candidate"],
+    autopct='%1.1f%%',
+    textprops={'fontsize': 8}
+)
+ax.set_title("Match Distribution")
+
+st.pyplot(fig)
 
         # Candidate details
         for i, (name, score) in enumerate(scores):

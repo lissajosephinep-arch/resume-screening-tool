@@ -8,23 +8,61 @@ from sklearn.metrics.pairwise import cosine_similarity
 # Page config
 st.set_page_config(page_title="AI Resume Screener", layout="wide")
 
-# CUSTOM CSS
+# 🔥 DARK PREMIUM UI CSS
 st.markdown("""
 <style>
-body {
+
+/* Background */
+[data-testid="stAppViewContainer"] {
     background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
 }
-h1, h2, h3 {
-    text-align: center;
-    color: white;
+
+/* Main container */
+[data-testid="stMain"] {
+    background-color: rgba(0, 0, 0, 0.4);
+    padding: 20px;
+    border-radius: 15px;
 }
-.stButton>button {
+
+/* Text */
+h1, h2, h3, label {
+    color: white !important;
+}
+
+/* Text area */
+textarea {
+    background-color: #1e1e1e !important;
+    color: white !important;
+    border-radius: 10px;
+}
+
+/* File uploader */
+[data-testid="stFileUploader"] {
+    background-color: #1e1e1e;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+/* Button */
+.stButton > button {
     background: linear-gradient(90deg, #00c6ff, #0072ff);
     color: white;
     border-radius: 10px;
     height: 3em;
     width: 100%;
+    border: none;
 }
+
+/* Remove white blocks */
+.block-container {
+    background: transparent !important;
+}
+
+/* Progress bar */
+.stProgress > div > div {
+    background-color: #00c6ff;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -40,9 +78,9 @@ with col1:
     job_desc = st.text_area("📄 Job Description", height=250)
 
 with col2:
-    uploaded_files = st.file_uploader("📂 Upload Resumes", accept_multiple_files=True)
+    uploaded_files = st.file_uploader("📂 Upload Resumes (PDF)", accept_multiple_files=True)
 
-# Extract text
+# Extract text from PDF
 def extract_text(file):
     text = ""
     with fitz.open(stream=file.read(), filetype="pdf") as doc:
@@ -50,13 +88,14 @@ def extract_text(file):
             text += page.get_text()
     return text
 
-# Skill extraction (simple keyword split)
+# Extract skills
 def get_skills(text):
     words = text.lower().split()
     return set(words)
 
 st.markdown("---")
 
+# Main button
 if st.button("🚀 Screen Resumes"):
 
     if job_desc and uploaded_files:
@@ -68,18 +107,20 @@ if st.button("🚀 Screen Resumes"):
         for file in uploaded_files:
             resume_text = extract_text(file)
 
+            # Similarity
             text_data = [job_desc, resume_text]
             cv = CountVectorizer().fit_transform(text_data)
             similarity = cosine_similarity(cv)[0][1]
 
+            # Skills
             resume_skills = get_skills(resume_text)
-
             matched = jd_skills.intersection(resume_skills)
             missing = jd_skills - resume_skills
 
             scores.append((file.name, round(similarity * 100, 2)))
             skill_results.append((file.name, matched, missing))
 
+        # Sort
         scores.sort(key=lambda x: x[1], reverse=True)
 
         df = pd.DataFrame(scores, columns=["Candidate", "Match %"])
@@ -90,10 +131,16 @@ if st.button("🚀 Screen Resumes"):
         top = df.iloc[0]
         st.success(f"🌟 Top Candidate: {top['Candidate']} ({top['Match %']}%)")
 
-        # PIE CHART 📊
+        # 📊 Pie chart (small & clean)
         st.markdown("### 📊 Match Distribution")
-        fig, ax = plt.subplots()
-        ax.pie(df["Match %"], labels=df["Candidate"], autopct='%1.1f%%')
+        fig, ax = plt.subplots(figsize=(4, 4))
+        ax.pie(
+            df["Match %"],
+            labels=df["Candidate"],
+            autopct='%1.1f%%',
+            textprops={'fontsize': 8}
+        )
+        ax.set_title("Match Distribution")
         st.pyplot(fig)
 
         # Candidate details
@@ -118,7 +165,7 @@ if st.button("🚀 Screen Resumes"):
 
             st.markdown("---")
 
-        # Download
+        # Download CSV
         csv = df.to_csv(index=False).encode('utf-8')
         st.download_button("📥 Download Results", csv, "results.csv", "text/csv")
 

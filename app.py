@@ -8,11 +8,11 @@ from sklearn.metrics.pairwise import cosine_similarity
 # Page config
 st.set_page_config(page_title="AI Resume Screener", layout="wide")
 
-# 🔥 ANIMATED GRADIENT BACKGROUND
+# 🔥 ANIMATED GRADIENT BACKGROUND + FIXED FILE UPLOADER TEXT
 st.markdown("""
 <style>
 
-/* FORCE FULL BACKGROUND */
+/* FULL PAGE BACKGROUND */
 html, body, [data-testid="stAppViewContainer"] {
     height: 100%;
     margin: 0;
@@ -26,43 +26,66 @@ html, body, [data-testid="stAppViewContainer"] {
     animation: gradientMove 15s ease infinite;
 }
 
-/* Animation Keyframes */
+/* Animation */
 @keyframes gradientMove {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
 
-/* Make content transparent */
+/* Transparent container */
 .block-container {
     background: transparent !important;
 }
 
-/* Glass effect */
+/* Glass UI */
 [data-testid="stMain"] {
     background-color: rgba(0, 0, 0, 0.4);
     padding: 20px;
     border-radius: 15px;
 }
 
-/* Text */
-h1, h2, h3, label {
+/* TEXT */
+h1, h2, h3, h4, h5, h6, label, p, div {
     color: white !important;
 }
 
-/* Inputs */
+/* TEXTAREA */
 textarea {
     background-color: #1e1e1e !important;
     color: white !important;
 }
 
-/* Button */
+/* BUTTON */
 .stButton > button {
     background: linear-gradient(90deg, #00c6ff, #0072ff);
     color: white;
     border-radius: 10px;
     height: 3em;
     width: 100%;
+    border: none;
+}
+
+/* 🔥 FILE UPLOADER FIX (IMPORTANT) */
+[data-testid="stFileUploader"] * {
+    color: white !important;
+}
+
+/* Uploaded file names */
+[data-testid="stFileUploaderFile"] {
+    color: white !important;
+}
+
+/* Drag text */
+[data-testid="stFileUploaderDropzone"] {
+    color: white !important;
+}
+
+/* Optional: uploader box styling */
+[data-testid="stFileUploader"] {
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 10px;
+    border-radius: 10px;
 }
 
 </style>
@@ -133,7 +156,7 @@ if st.button("🚀 Screen Resumes"):
         top = df.iloc[0]
         st.success(f"🌟 Top Candidate: {top['Candidate']} ({top['Match %']}%)")
 
-        # 📊 Pie chart (small)
+        # Pie chart
         st.markdown("### 📊 Match Distribution")
         fig, ax = plt.subplots(figsize=(4, 4))
         ax.pie(

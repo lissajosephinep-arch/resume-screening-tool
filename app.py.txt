@@ -1,0 +1,57 @@
+import streamlit as st
+from PyPDF2 import PdfReader
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+# Title
+st.title("AI Resume Screening Tool")
+
+# Job Description Input
+job_desc = st.text_area("Paste Job Description Here")
+
+# Upload Resumes
+uploaded_files = st.file_uploader("Upload Resumes (PDF)", accept_multiple_files=True)
+
+# Function to extract text from PDF
+def extract_text(file):
+    text = ""
+    reader = PdfReader(file)
+    for page in reader.pages:
+        if page.extract_text():
+            text += page.extract_text()
+    return text
+
+# Button to process
+if st.button("Screen Resumes"):
+
+    if job_desc and uploaded_files:
+        scores = []
+
+        for file in uploaded_files:
+            resume_text = extract_text(file)
+
+            # Combine JD and resume
+            text_data = [job_desc, resume_text]
+
+            # Convert text to numbers
+            cv = CountVectorizer().fit_transform(text_data)
+            similarity = cosine_similarity(cv)[0][1]
+
+            scores.append((file.name, round(similarity * 100, 2)))
+
+        # Sort by score
+        scores.sort(key=lambda x: x[1], reverse=True)
+
+        # Display results
+        st.subheader("Candidate Ranking")
+
+        for name, score in scores:
+            if score >= 70:
+                st.success(f"{name} - {score}% match ✅ (Top Candidate)")
+            elif score >= 50:
+                st.warning(f"{name} - {score}% match ⚠️ (Average)")
+            else:
+                st.error(f"{name} - {score}% match ❌ (Low Match)")
+
+    else:
+        st.warning("Please upload resumes and enter job description")

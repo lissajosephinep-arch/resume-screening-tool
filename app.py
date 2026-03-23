@@ -84,27 +84,39 @@ if st.button("🚀 Screen Resumes"):
 
         df = pd.DataFrame(scores, columns=["Candidate", "Match %"])
 
-    st.markdown("## 🏆 Results")
+   st.markdown("## 🏆 Results")
 
 # Top candidate
 top = df.iloc[0]
 st.success(f"🌟 Top Candidate: {top['Candidate']} ({top['Match %']}%)")
 
-# PIE CHART
+# Pie Chart
 fig, ax = plt.subplots(figsize=(4, 4))
 ax.pie(df["Match %"], labels=df["Candidate"], autopct='%1.1f%%')
+ax.set_title("Match Distribution")
 st.pyplot(fig)
 
 # Candidate loop
 for i, (name, score) in enumerate(scores):
     st.markdown(f"### {name}")
     st.progress(int(score))
-ax.pie(
-    df["Match %"],
-    labels=df["Candidate"],
-    autopct='%1.1f%%',
-    textprops={'fontsize': 8}
-)
+
+    matched, missing = skill_results[i][1], skill_results[i][2]
+
+    st.markdown("**✅ Matched Skills:**")
+    st.write(", ".join(list(matched)[:10]) if matched else "None")
+
+    st.markdown("**❌ Missing Skills:**")
+    st.write(", ".join(list(missing)[:10]) if missing else "None")
+
+    if score >= 70:
+        st.success("Excellent Match ✅")
+    elif score >= 50:
+        st.warning("Good Match ⚠️")
+    else:
+        st.error("Low Match ❌")
+
+    st.markdown("---")
 ax.set_title("Match Distribution")
 
 st.pyplot(fig)

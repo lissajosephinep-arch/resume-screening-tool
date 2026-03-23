@@ -1,41 +1,4 @@
 import streamlit as st
-from PyPDF2 import PdfReader
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-
-st.title("AI Resume Screening Tool")
-
-job_desc = st.text_area("Paste Job Description Here")
-uploaded_files = st.file_uploader("Upload Resumes (PDF)", accept_multiple_files=True)
-
-def extract_text(file):
-    text = ""
-    reader = PdfReader(file)
-    for page in reader.pages:
-        if page.extract_text():
-            text += page.extract_text()
-    return text
-
-if st.button("Screen Resumes"):
-
-    if job_desc and uploaded_files:
-        scores = []
-
-        for file in uploaded_files:
-            resume_text = extract_text(file)
-
-            text_data = [job_desc, resume_text]
-            cv = CountVectorizer().fit_transform(text_data)
-            similarity = cosine_similarity(cv)[0][1]
-
-            scores.append((file.name, round(similarity * 100, 2)))
-
-        scores.sort(key=lambda x: x[1], reverse=True)
-
-        st.subheader("Candidate Ranking")
-
-        for name, score in scores:
-            st.write(f"{name} - {score}% match")
-
-    else:
-        st.warning("Please upload resumes and enter job description")
+pandas
+PyPDF2
+scikit-learn

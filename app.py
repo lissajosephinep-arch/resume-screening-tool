@@ -65,6 +65,11 @@ textarea {
     width: 100%;
 }
 
+/* 🔥 ONLY THIS FIX (your requirement) */
+[data-testid="stFileUploaderFile"] div {
+    color: white !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -133,7 +138,7 @@ if st.button("🚀 Screen Resumes"):
         top = df.iloc[0]
         st.success(f"🌟 Top Candidate: {top['Candidate']} ({top['Match %']}%)")
 
-        # 📊 Pie chart (small)
+        # 📊 Pie chart
         st.markdown("### 📊 Match Distribution")
         fig, ax = plt.subplots(figsize=(4, 4))
         ax.pie(

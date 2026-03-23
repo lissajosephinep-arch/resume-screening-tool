@@ -12,21 +12,33 @@ st.set_page_config(page_title="AI Resume Screener", layout="wide")
 st.markdown("""
 <style>
 
-/* Animated Background */
+/* FORCE FULL BACKGROUND */
+html, body, [data-testid="stAppViewContainer"] {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* Animated Gradient */
 [data-testid="stAppViewContainer"] {
     background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #1c1c1c);
     background-size: 400% 400%;
-    animation: gradientMove 12s ease infinite;
+    animation: gradientMove 15s ease infinite;
 }
 
-/* Animation */
+/* Animation Keyframes */
 @keyframes gradientMove {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
 
-/* Glass container */
+/* Make content transparent */
+.block-container {
+    background: transparent !important;
+}
+
+/* Glass effect */
 [data-testid="stMain"] {
     background-color: rgba(0, 0, 0, 0.4);
     padding: 20px;
@@ -38,18 +50,10 @@ h1, h2, h3, label {
     color: white !important;
 }
 
-/* Text area */
+/* Inputs */
 textarea {
     background-color: #1e1e1e !important;
     color: white !important;
-    border-radius: 10px;
-}
-
-/* File uploader */
-[data-testid="stFileUploader"] {
-    background-color: #1e1e1e;
-    padding: 10px;
-    border-radius: 10px;
 }
 
 /* Button */
@@ -59,12 +63,6 @@ textarea {
     border-radius: 10px;
     height: 3em;
     width: 100%;
-    border: none;
-}
-
-/* Progress bar */
-.stProgress > div > div {
-    background-color: #00c6ff;
 }
 
 </style>

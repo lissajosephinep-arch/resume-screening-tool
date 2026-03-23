@@ -1,35 +1,22 @@
 import streamlit as st
 import fitz  # PyMuPDF
 import pandas as pd
+import matplotlib.pyplot as plt
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 # Page config
 st.set_page_config(page_title="AI Resume Screener", layout="wide")
 
-# CUSTOM CSS (🔥 MAIN DESIGN)
+# CUSTOM CSS
 st.markdown("""
 <style>
 body {
     background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
 }
-.main {
-    background-color: rgba(255, 255, 255, 0.05);
-    padding: 20px;
-    border-radius: 15px;
-}
 h1, h2, h3 {
     text-align: center;
     color: white;
-}
-.stTextArea textarea {
-    background-color: #1e1e1e;
-    color: white;
-}
-.stFileUploader {
-    background-color: #1e1e1e;
-    padding: 10px;
-    border-radius: 10px;
 }
 .stButton>button {
     background: linear-gradient(90deg, #00c6ff, #0072ff);
@@ -44,7 +31,6 @@ h1, h2, h3 {
 # Title
 st.markdown("<h1>🚀 AI Resume Screening Tool</h1>", unsafe_allow_html=True)
 st.markdown("<h3>Smart Shortlisting for Recruiters</h3>", unsafe_allow_html=True)
-
 st.markdown("---")
 
 # Layout
@@ -64,13 +50,20 @@ def extract_text(file):
             text += page.get_text()
     return text
 
+# Skill extraction (simple keyword split)
+def get_skills(text):
+    words = text.lower().split()
+    return set(words)
+
 st.markdown("---")
 
-# Button
 if st.button("🚀 Screen Resumes"):
 
     if job_desc and uploaded_files:
         scores = []
+        skill_results = []
+
+        jd_skills = get_skills(job_desc)
 
         for file in uploaded_files:
             resume_text = extract_text(file)
@@ -79,7 +72,13 @@ if st.button("🚀 Screen Resumes"):
             cv = CountVectorizer().fit_transform(text_data)
             similarity = cosine_similarity(cv)[0][1]
 
+            resume_skills = get_skills(resume_text)
+
+            matched = jd_skills.intersection(resume_skills)
+            missing = jd_skills - resume_skills
+
             scores.append((file.name, round(similarity * 100, 2)))
+            skill_results.append((file.name, matched, missing))
 
         scores.sort(key=lambda x: x[1], reverse=True)
 
@@ -91,9 +90,24 @@ if st.button("🚀 Screen Resumes"):
         top = df.iloc[0]
         st.success(f"🌟 Top Candidate: {top['Candidate']} ({top['Match %']}%)")
 
-        for name, score in scores:
+        # PIE CHART 📊
+        st.markdown("### 📊 Match Distribution")
+        fig, ax = plt.subplots()
+        ax.pie(df["Match %"], labels=df["Candidate"], autopct='%1.1f%%')
+        st.pyplot(fig)
+
+        # Candidate details
+        for i, (name, score) in enumerate(scores):
             st.markdown(f"### {name}")
             st.progress(int(score))
+
+            matched, missing = skill_results[i][1], skill_results[i][2]
+
+            st.markdown("**✅ Matched Skills:**")
+            st.write(", ".join(list(matched)[:10]) if matched else "None")
+
+            st.markdown("**❌ Missing Skills:**")
+            st.write(", ".join(list(missing)[:10]) if missing else "None")
 
             if score >= 70:
                 st.success("Excellent Match ✅")

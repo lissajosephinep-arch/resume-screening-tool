@@ -8,11 +8,11 @@ from sklearn.metrics.pairwise import cosine_similarity
 # Page config
 st.set_page_config(page_title="AI Resume Screener", layout="wide")
 
-# 🔥 ANIMATED GRADIENT BACKGROUND + FIXED FILE UPLOADER TEXT
+# 🔥 ANIMATED BACKGROUND + FIXED FILE NAME COLOR
 st.markdown("""
 <style>
 
-/* FULL PAGE BACKGROUND */
+/* FULL BACKGROUND */
 html, body, [data-testid="stAppViewContainer"] {
     height: 100%;
     margin: 0;
@@ -45,8 +45,8 @@ html, body, [data-testid="stAppViewContainer"] {
     border-radius: 15px;
 }
 
-/* TEXT */
-h1, h2, h3, h4, h5, h6, label, p, div {
+/* GENERAL TEXT (WHITE UI) */
+h1, h2, h3, h4, h5, h6, div {
     color: white !important;
 }
 
@@ -66,26 +66,20 @@ textarea {
     border: none;
 }
 
-/* 🔥 FILE UPLOADER FIX (IMPORTANT) */
-[data-testid="stFileUploader"] * {
+/* 🔥 KEEP FILE UPLOADER TEXT BLACK */
+[data-testid="stFileUploader"] label,
+[data-testid="stFileUploader"] p {
+    color: black !important;
+}
+
+/* 🔥 ONLY FILE NAMES -> WHITE */
+[data-testid="stFileUploaderFileName"] {
     color: white !important;
 }
 
-/* Uploaded file names */
-[data-testid="stFileUploaderFile"] {
+/* Fallback (important for cloud) */
+[data-testid="stFileUploaderFile"] span {
     color: white !important;
-}
-
-/* Drag text */
-[data-testid="stFileUploaderDropzone"] {
-    color: white !important;
-}
-
-/* Optional: uploader box styling */
-[data-testid="stFileUploader"] {
-    background-color: rgba(255, 255, 255, 0.05);
-    padding: 10px;
-    border-radius: 10px;
 }
 
 </style>
@@ -132,12 +126,12 @@ if st.button("🚀 Screen Resumes"):
         for file in uploaded_files:
             resume_text = extract_text(file)
 
-            # Similarity calculation
+            # Similarity
             text_data = [job_desc, resume_text]
             cv = CountVectorizer().fit_transform(text_data)
             similarity = cosine_similarity(cv)[0][1]
 
-            # Skill comparison
+            # Skills
             resume_skills = get_skills(resume_text)
             matched = jd_skills.intersection(resume_skills)
             missing = jd_skills - resume_skills
@@ -145,7 +139,7 @@ if st.button("🚀 Screen Resumes"):
             scores.append((file.name, round(similarity * 100, 2)))
             skill_results.append((file.name, matched, missing))
 
-        # Sort results
+        # Sort
         scores.sort(key=lambda x: x[1], reverse=True)
 
         df = pd.DataFrame(scores, columns=["Candidate", "Match %"])
@@ -156,7 +150,7 @@ if st.button("🚀 Screen Resumes"):
         top = df.iloc[0]
         st.success(f"🌟 Top Candidate: {top['Candidate']} ({top['Match %']}%)")
 
-        # Pie chart
+        # Chart
         st.markdown("### 📊 Match Distribution")
         fig, ax = plt.subplots(figsize=(4, 4))
         ax.pie(
@@ -168,7 +162,7 @@ if st.button("🚀 Screen Resumes"):
         ax.set_title("Match Distribution")
         st.pyplot(fig)
 
-        # Candidate details
+        # Details
         for i, (name, score) in enumerate(scores):
             st.markdown(f"### {name}")
             st.progress(int(score))

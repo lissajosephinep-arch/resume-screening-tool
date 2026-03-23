@@ -1,29 +1,62 @@
 import streamlit as st
 import fitz  # PyMuPDF
+import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-# Page Config
+# Page config
 st.set_page_config(page_title="AI Resume Screener", layout="wide")
 
+# CUSTOM CSS (🔥 MAIN DESIGN)
+st.markdown("""
+<style>
+body {
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+}
+.main {
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 20px;
+    border-radius: 15px;
+}
+h1, h2, h3 {
+    text-align: center;
+    color: white;
+}
+.stTextArea textarea {
+    background-color: #1e1e1e;
+    color: white;
+}
+.stFileUploader {
+    background-color: #1e1e1e;
+    padding: 10px;
+    border-radius: 10px;
+}
+.stButton>button {
+    background: linear-gradient(90deg, #00c6ff, #0072ff);
+    color: white;
+    border-radius: 10px;
+    height: 3em;
+    width: 100%;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # Title
-st.markdown("<h1 style='text-align: center; color: #4CAF50;'>AI Resume Screening Tool</h1>", unsafe_allow_html=True)
+st.markdown("<h1>🚀 AI Resume Screening Tool</h1>", unsafe_allow_html=True)
+st.markdown("<h3>Smart Shortlisting for Recruiters</h3>", unsafe_allow_html=True)
+
 st.markdown("---")
 
 # Layout
 col1, col2 = st.columns(2)
 
-# Job Description
 with col1:
-    st.subheader("📄 Job Description")
-    job_desc = st.text_area("Paste Job Description Here", height=250)
+    job_desc = st.text_area("📄 Job Description", height=250)
 
-# Resume Upload
 with col2:
-    st.subheader("📂 Upload Resumes")
-    uploaded_files = st.file_uploader("Upload PDF files", accept_multiple_files=True)
+    uploaded_files = st.file_uploader("📂 Upload Resumes", accept_multiple_files=True)
 
-# Extract text from PDF
+# Extract text
 def extract_text(file):
     text = ""
     with fitz.open(stream=file.read(), filetype="pdf") as doc:
@@ -50,15 +83,30 @@ if st.button("🚀 Screen Resumes"):
 
         scores.sort(key=lambda x: x[1], reverse=True)
 
-        st.subheader("🏆 Candidate Ranking")
+        df = pd.DataFrame(scores, columns=["Candidate", "Match %"])
+
+        st.markdown("## 🏆 Results")
+
+        # Top candidate
+        top = df.iloc[0]
+        st.success(f"🌟 Top Candidate: {top['Candidate']} ({top['Match %']}%)")
 
         for name, score in scores:
+            st.markdown(f"### {name}")
+            st.progress(int(score))
+
             if score >= 70:
-                st.success(f"✅ {name} — {score}% (Top Candidate)")
+                st.success("Excellent Match ✅")
             elif score >= 50:
-                st.warning(f"⚠️ {name} — {score}% (Good Match)")
+                st.warning("Good Match ⚠️")
             else:
-                st.error(f"❌ {name} — {score}% (Low Match)")
+                st.error("Low Match ❌")
+
+            st.markdown("---")
+
+        # Download
+        csv = df.to_csv(index=False).encode('utf-8')
+        st.download_button("📥 Download Results", csv, "results.csv", "text/csv")
 
     else:
-        st.warning("⚠️ Please upload resumes and enter job description")
+        st.warning("⚠️ Please enter job description and upload resumes")

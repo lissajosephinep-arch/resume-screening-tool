@@ -3,11 +3,27 @@ import fitz  # PyMuPDF
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-st.title("AI Resume Screening Tool")
+# Page Config
+st.set_page_config(page_title="AI Resume Screener", layout="wide")
 
-job_desc = st.text_area("Paste Job Description Here")
-uploaded_files = st.file_uploader("Upload Resumes (PDF)", accept_multiple_files=True)
+# Title
+st.markdown("<h1 style='text-align: center; color: #4CAF50;'>AI Resume Screening Tool</h1>", unsafe_allow_html=True)
+st.markdown("---")
 
+# Layout
+col1, col2 = st.columns(2)
+
+# Job Description
+with col1:
+    st.subheader("📄 Job Description")
+    job_desc = st.text_area("Paste Job Description Here", height=250)
+
+# Resume Upload
+with col2:
+    st.subheader("📂 Upload Resumes")
+    uploaded_files = st.file_uploader("Upload PDF files", accept_multiple_files=True)
+
+# Extract text from PDF
 def extract_text(file):
     text = ""
     with fitz.open(stream=file.read(), filetype="pdf") as doc:
@@ -15,7 +31,10 @@ def extract_text(file):
             text += page.get_text()
     return text
 
-if st.button("Screen Resumes"):
+st.markdown("---")
+
+# Button
+if st.button("🚀 Screen Resumes"):
 
     if job_desc and uploaded_files:
         scores = []
@@ -31,10 +50,15 @@ if st.button("Screen Resumes"):
 
         scores.sort(key=lambda x: x[1], reverse=True)
 
-        st.subheader("Candidate Ranking")
+        st.subheader("🏆 Candidate Ranking")
 
         for name, score in scores:
-            st.write(f"{name} - {score}% match")
+            if score >= 70:
+                st.success(f"✅ {name} — {score}% (Top Candidate)")
+            elif score >= 50:
+                st.warning(f"⚠️ {name} — {score}% (Good Match)")
+            else:
+                st.error(f"❌ {name} — {score}% (Low Match)")
 
     else:
-        st.warning("Please upload resumes and enter job description")
+        st.warning("⚠️ Please upload resumes and enter job description")

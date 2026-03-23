@@ -172,4 +172,4 @@ if st.button("🚀 Screen Resumes"):
         st.download_button("📥 Download Results", csv, "results.csv", "text/csv")
 
     else:
-        st.warning("⚠️ Please enter job description and upload resu
+        st.warning("⚠️ Please enter job description and upload resumes")

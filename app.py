@@ -8,11 +8,11 @@ from sklearn.metrics.pairwise import cosine_similarity
 # Page config
 st.set_page_config(page_title="AI Resume Screener", layout="wide")
 
-# 🔥 ANIMATED BACKGROUND + FIXED FILE NAME COLOR
+# 🔥 ANIMATED GRADIENT BACKGROUND
 st.markdown("""
 <style>
 
-/* FULL BACKGROUND */
+/* FORCE FULL BACKGROUND */
 html, body, [data-testid="stAppViewContainer"] {
     height: 100%;
     margin: 0;
@@ -26,60 +26,43 @@ html, body, [data-testid="stAppViewContainer"] {
     animation: gradientMove 15s ease infinite;
 }
 
-/* Animation */
+/* Animation Keyframes */
 @keyframes gradientMove {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
 
-/* Transparent container */
+/* Make content transparent */
 .block-container {
     background: transparent !important;
 }
 
-/* Glass UI */
+/* Glass effect */
 [data-testid="stMain"] {
     background-color: rgba(0, 0, 0, 0.4);
     padding: 20px;
     border-radius: 15px;
 }
 
-/* GENERAL TEXT (WHITE UI) */
-h1, h2, h3, h4, h5, h6, div {
+/* Text */
+h1, h2, h3, label {
     color: white !important;
 }
 
-/* TEXTAREA */
+/* Inputs */
 textarea {
     background-color: #1e1e1e !important;
     color: white !important;
 }
 
-/* BUTTON */
+/* Button */
 .stButton > button {
     background: linear-gradient(90deg, #00c6ff, #0072ff);
     color: white;
     border-radius: 10px;
     height: 3em;
     width: 100%;
-    border: none;
-}
-
-/* 🔥 KEEP FILE UPLOADER TEXT BLACK */
-[data-testid="stFileUploader"] label,
-[data-testid="stFileUploader"] p {
-    color: black !important;
-}
-
-/* 🔥 ONLY FILE NAMES -> WHITE */
-[data-testid="stFileUploaderFileName"] {
-    color: white !important;
-}
-
-/* Fallback (important for cloud) */
-[data-testid="stFileUploaderFile"] span {
-    color: white !important;
 }
 
 </style>
@@ -126,12 +109,12 @@ if st.button("🚀 Screen Resumes"):
         for file in uploaded_files:
             resume_text = extract_text(file)
 
-            # Similarity
+            # Similarity calculation
             text_data = [job_desc, resume_text]
             cv = CountVectorizer().fit_transform(text_data)
             similarity = cosine_similarity(cv)[0][1]
 
-            # Skills
+            # Skill comparison
             resume_skills = get_skills(resume_text)
             matched = jd_skills.intersection(resume_skills)
             missing = jd_skills - resume_skills
@@ -139,7 +122,7 @@ if st.button("🚀 Screen Resumes"):
             scores.append((file.name, round(similarity * 100, 2)))
             skill_results.append((file.name, matched, missing))
 
-        # Sort
+        # Sort results
         scores.sort(key=lambda x: x[1], reverse=True)
 
         df = pd.DataFrame(scores, columns=["Candidate", "Match %"])
@@ -150,7 +133,7 @@ if st.button("🚀 Screen Resumes"):
         top = df.iloc[0]
         st.success(f"🌟 Top Candidate: {top['Candidate']} ({top['Match %']}%)")
 
-        # Chart
+        # 📊 Pie chart (small)
         st.markdown("### 📊 Match Distribution")
         fig, ax = plt.subplots(figsize=(4, 4))
         ax.pie(
@@ -162,7 +145,7 @@ if st.button("🚀 Screen Resumes"):
         ax.set_title("Match Distribution")
         st.pyplot(fig)
 
-        # Details
+        # Candidate details
         for i, (name, score) in enumerate(scores):
             st.markdown(f"### {name}")
             st.progress(int(score))
@@ -189,4 +172,4 @@ if st.button("🚀 Screen Resumes"):
         st.download_button("📥 Download Results", csv, "results.csv", "text/csv")
 
     else:
-        st.warning("⚠️ Please enter job description and upload resumes")
+        st.warning("⚠️ Please enter job description and upload resu

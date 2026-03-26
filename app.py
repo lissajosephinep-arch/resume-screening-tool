@@ -157,10 +157,16 @@ if st.button("🚀 Screen Resumes"):
             matched, missing = skill_results[i][1], skill_results[i][2]
 
             st.markdown("<p style='color:white'><b>✅ Matched Skills:</b></p>", unsafe_allow_html=True)
-            st.write(", ".join(list(matched)[:10]) if matched else "None")
+            st.markdown(
+    f"<p style='color:white'>{', '.join(list(matched)[:10]) if matched else 'None'}</p>",
+    unsafe_allow_html=True
+)
 
             st.markdown("<p style='color:white'><b>❌ Missing Skills:</b></p>", unsafe_allow_html=True)
-            st.write(", ".join(list(missing)[:10]) if missing else "None")
+            st.markdown(
+    f"<p style='color:white'>{', '.join(list(missing)[:10]) if missing else 'None'}</p>",
+    unsafe_allow_html=True
+)
 
             if score >= 70:
                 st.success("Excellent Match ✅")

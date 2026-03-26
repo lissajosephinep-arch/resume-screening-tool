@@ -64,7 +64,20 @@ textarea {
     height: 3em;
     width: 100%;
 }
+/* Make all normal text white */
+p, span, div {
+    color: white !important;
+}
 
+/* Fix markdown text */
+[data-testid="stMarkdownContainer"] {
+    color: white !important;
+}
+
+/* Fix success/warning/error text */
+.stAlert {
+    color: white !important;
+}
 /* 🔥 ONLY THIS FIX (your requirement) */
 [data-testid="stFileUploaderFile"] div {
     color: white !important;

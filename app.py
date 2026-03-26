@@ -151,15 +151,15 @@ if st.button("🚀 Screen Resumes"):
 
         # Candidate details
         for i, (name, score) in enumerate(scores):
-            st.markdown(f"### {name}")
+            st.markdown(f"<h3 style='color:white'>{name}</h3>", unsafe_allow_html=True)
             st.progress(int(score))
 
             matched, missing = skill_results[i][1], skill_results[i][2]
 
-            st.markdown("**✅ Matched Skills:**")
+            st.markdown("<p style='color:white'><b>✅ Matched Skills:</b></p>", unsafe_allow_html=True)
             st.write(", ".join(list(matched)[:10]) if matched else "None")
 
-            st.markdown("**❌ Missing Skills:**")
+            st.markdown("<p style='color:white'><b>❌ Missing Skills:</b></p>", unsafe_allow_html=True)
             st.write(", ".join(list(missing)[:10]) if missing else "None")
 
             if score >= 70:

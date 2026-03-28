@@ -12,32 +12,33 @@ st.set_page_config(page_title="AI Resume Screener", layout="wide")
 st.markdown("""
 <style>
 
-st.markdown("""
-<style>
+/* FORCE FULL BACKGROUND */
+html, body, [data-testid="stAppViewContainer"] {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* Animated Gradient */
+[data-testid="stAppViewContainer"] {
+    background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #1c1c1c);
+    background-size: 400% 400%;
+    animation: gradientMove 15s ease infinite;
+}
+
+/* Animation Keyframes */
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
 /* Make content transparent */
 .block-container {
     background: transparent !important;
 }
 
-/* Video background */
-[data-testid="stAppViewContainer"] {
-    position: relative;
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-}
-
-#bg-video {
-    position: fixed;
-    right: 0;
-    bottom: 0;
-    min-width: 100%;
-    min-height: 100%;
-    z-index: -1;
-    object-fit: cover;
-}
-
-/* Glass effect for content */
+/* Glass effect */
 [data-testid="stMain"] {
     background-color: rgba(0, 0, 0, 0.4);
     padding: 20px;
@@ -49,6 +50,12 @@ h1, h2, h3, label {
     color: white !important;
 }
 
+/* Inputs */
+textarea {
+    background-color: #1e1e1e !important;
+    color: white !important;
+}
+
 /* Button */
 .stButton > button {
     background: linear-gradient(90deg, #00c6ff, #0072ff);
@@ -57,11 +64,12 @@ h1, h2, h3, label {
     height: 3em;
     width: 100%;
 }
-</style>
+/* 🔥 ONLY THIS FIX (your requirement) */
+[data-testid="stFileUploaderFile"] div {
+    color: white !important;
+}
 
-<video autoplay muted loop id="bg-video">
-  <source src="your_video.mp4" type="video/mp4">
-</video>
+</style>
 """, unsafe_allow_html=True)
 
 # Title
@@ -175,4 +183,3 @@ if st.button("🚀 Screen Resumes"):
 
     else:
         st.warning("⚠️ Please enter job description and upload resumes")
-
